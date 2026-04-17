@@ -9,9 +9,6 @@ import org.springframework.data.domain.Sort;
 import java.io.Serializable;
 import java.util.List;
 
-/**
- * Created by garik
- */
 public abstract class AbstractRemovableDataService<T extends AbstractRemovableEntity, ID extends Serializable> implements RemovableDataService<T, ID> {
 
     protected BaseRemovableRepository<T, ID> repository;

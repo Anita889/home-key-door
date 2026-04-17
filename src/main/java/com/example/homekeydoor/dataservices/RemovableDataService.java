@@ -8,9 +8,6 @@ import org.springframework.data.domain.Sort;
 import java.io.Serializable;
 import java.util.List;
 
-/**
- * Created by garik
- */
 public interface RemovableDataService<T extends AbstractEntity, ID extends Serializable> {
     T save(T object);
 

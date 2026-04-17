@@ -4,9 +4,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.Collection;
 
-/**
- * Created by garik
- */
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RoleDTO extends AbstractDTO {

@@ -1,49 +1,31 @@
 package com.example.homekeydoor.security;
 
-import com.puzl.user.rest.security.*;
-import com.puzl.user.rest.security.service.AIUserDetailsService;
-import com.puzl.user.rest.security.service.UserSecurityService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-/**
- * Created by garik on 5/26/17
- */
-
+@Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
+@EnableMethodSecurity(prePostEnabled = true, securedEnabled = true)
+@RequiredArgsConstructor
+public class SecurityConfig {
 
-
-	@Autowired
-	private EntryPointUnauthorizedHandler unauthorizedHandler;
-
-//	@Autowired
-//	private CustomerDetailsService customerDetailsService;
-//
-//	@Autowired
-//	private CustomerSecurityService customerSecurityService;
-
-	@Autowired
-	private AIUserDetailsService userDetailsService;
-
-	@Autowired
-	private UserSecurityService userSecurityService;
-
-	@Autowired
-	private AuthenticationTokenService authenticationTokenService;
+	private final EntryPointUnauthorizedHandler unauthorizedHandler;
+	private final UserDetailsServiceImpl userDetailsService;
+	private final AuthenticationTokenService authenticationTokenService;
 
 	@Value("${security.token.header}")
 	private String tokenHeader;
@@ -51,76 +33,70 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Value("${security.refreshtoken.header}")
 	private String refreshTokenHeader;
 
+	// ✅ Password encoder
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
 
 	@Bean
-	public AIUserDetailsService userDetailsService() {
-		return userDetailsService;
+	public AuthenticationProvider userAuthProvider() {
+		UserAuthProvider provider = new UserAuthProvider(userDetailsService);
+		provider.setPasswordEncoder(passwordEncoder());
+		return provider;
 	}
-
 	@Bean
-	public UserSecurityService userSecurityService() {
-		return userSecurityService;
+	public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+		return config.getAuthenticationManager();
 	}
 
-
+	// ✅ Security filter chain
 	@Bean
-	public UserAuthProvider userAuthProvider() {
-		UserAuthProvider agencyAuthProvider = new UserAuthProvider();
-		agencyAuthProvider.setUserDetailsService(userDetailsService());
-		agencyAuthProvider.setPasswordEncoder(passwordEncoder());
-		return agencyAuthProvider;
-	}
+	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-	@Override
-	public void configure(WebSecurity web) throws Exception {
-		web.ignoring()
-//			.antMatchers(HttpMethod.OPTIONS, "/**")
-			.antMatchers("/v2/api-docs", "/configuration/ui/**", "/swagger-resources/**", "/configuration/security", "/swagger-ui.html", "/webjars/**");
-	}
-
-	@Override
-	protected void configure(HttpSecurity httpSecurity) throws Exception {
-		AuthTokenFilter authenticationTokenFilter = new AuthTokenFilter(authenticationTokenService);
-		authenticationTokenFilter.setAuthenticationManager(authenticationManagerBean());
+		AuthTokenFilter authenticationTokenFilter =
+				new AuthTokenFilter(authenticationTokenService);
 
 		CorsFilter corsFilter = new CorsFilter(tokenHeader, refreshTokenHeader);
 
-		httpSecurity
-			.antMatcher("/api/**")
-			.csrf()
-			.disable()
-			.exceptionHandling()
-			.authenticationEntryPoint(this.unauthorizedHandler)
-			.and()
-			.sessionManagement()
-			.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-			.and()
-			.authorizeRequests()
-			.antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-			.antMatchers("/api/user/authentication/**").permitAll()
-			.antMatchers("/api/user/health/**").permitAll()
-			.antMatchers("/api/test/**").permitAll()
-//				.antMatchers("/api/data/**").permitAll()
-//				.antMatchers("/api/users/**").permitAll()
-//				.antMatchers("/api/products/**").permitAll()
-//				.antMatchers("/api/tags/**").permitAll()
-//				.antMatchers("/api/roles/**").permitAll()
+		http
+				.securityMatcher("/api/**")
 
-			.anyRequest().authenticated()
-			.and()
-			.addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
-			.addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
+				.csrf(csrf -> csrf.disable())
+
+				.exceptionHandling(ex -> ex
+						.authenticationEntryPoint(unauthorizedHandler)
+				)
+
+				.sessionManagement(session -> session
+						.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+				)
+
+				.authorizeHttpRequests(auth -> auth
+						// public endpoints
+						.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+						.requestMatchers("/api/user/authentication/**").permitAll()
+						.requestMatchers("/api/user/health/**").permitAll()
+						.requestMatchers("/api/test/**").permitAll()
+
+						// swagger (replacement for web.ignoring)
+						.requestMatchers(
+								"/v2/api-docs",
+								"/swagger-ui/**",
+								"/swagger-resources/**",
+								"/configuration/**",
+								"/webjars/**",
+								"/v3/api-docs/**"
+						).permitAll()
+
+						.anyRequest().authenticated()
+				)
+
+				.authenticationProvider(userAuthProvider())
+
+				.addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
+				.addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
+
+		return http.build();
 	}
-
-	@Autowired
-	public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
-		authenticationManagerBuilder
-//			.authenticationProvider(customerAuthProvider())
-			.authenticationProvider(userAuthProvider());
-	}
-
 }

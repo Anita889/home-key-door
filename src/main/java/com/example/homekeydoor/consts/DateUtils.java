@@ -8,9 +8,6 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
-/**
- * Created by garik on 5/26/17
- */
 public class DateUtils {
     static DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("MM/dd/yyyy");
     static DateTimeFormatter dateFormatDash = DateTimeFormatter.ofPattern("MM-dd-yy");
