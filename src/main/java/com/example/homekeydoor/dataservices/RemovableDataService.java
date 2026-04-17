@@ -1,6 +1,6 @@
 package com.example.homekeydoor.dataservices;
 
-import com.example.homekeydoor.entities.AbstractEntity;
+import com.example.homekeydoor.entities.base.AbstractEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;

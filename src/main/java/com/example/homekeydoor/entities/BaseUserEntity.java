@@ -1,7 +1,9 @@
 package com.example.homekeydoor.entities;
 
-import com.example.homekeydoor.security.LocalDateTimeAttributeConverter;
-import com.example.homekeydoor.security.RegistrationType;
+import com.example.homekeydoor.entities.base.AbstractRemovableEntity;
+import com.example.homekeydoor.entities.base.Role;
+import com.example.homekeydoor.consts.LocalDateTimeAttributeConverter;
+import com.example.homekeydoor.consts.RegistrationType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.GeneratedValue;

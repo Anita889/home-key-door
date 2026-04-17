@@ -1,6 +1,6 @@
-package com.example.homekeydoor.entities;
+package com.example.homekeydoor.entities.base;
 
-import com.example.homekeydoor.security.LocalDateTimeAttributeConverter;
+import com.example.homekeydoor.consts.LocalDateTimeAttributeConverter;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.MappedSuperclass;

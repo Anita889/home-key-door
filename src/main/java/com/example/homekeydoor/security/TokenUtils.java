@@ -1,6 +1,10 @@
 package com.example.homekeydoor.security;
 
+import com.example.homekeydoor.consts.DateUtils;
+import com.example.homekeydoor.consts.UserType;
+import io.jsonwebtoken.security.Keys;
 import java.util.Date;
+import javax.crypto.SecretKey;
 import org.springframework.stereotype.Component;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
@@ -17,10 +21,13 @@ public class TokenUtils {
     public static String getUsernameFromToken(String token, String secret) {
         String username;
         try {
+            SecretKey key = Keys.hmacShaKeyFor(secret.getBytes());
+
             username = Jwts.parser()
-                    .setSigningKey(secret)
-                    .parseClaimsJws(token)
-                    .getBody()
+                    .verifyWith(key)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload()
                     .getSubject();
         } catch (Exception e) {
             username = null;
@@ -29,32 +36,37 @@ public class TokenUtils {
     }
 
     public static UserType getUserTypeFromToken(String token, String secret) {
-        String type;
-        UserType t;
         try {
-            type = Jwts.parser()
-                    .setSigningKey(secret)
-                    .parseClaimsJws(token).getBody().get(USER_TYPE, String.class);
-            t = UserType.getByLabel(type);
+            SecretKey key = Keys.hmacShaKeyFor(secret.getBytes());
+
+            String type = Jwts.parser()
+                    .verifyWith(key)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload()
+                    .get(USER_TYPE, String.class);
+
+            return UserType.getByLabel(type);
 
         } catch (Exception e) {
-            t = null;
+            return null;
         }
-        return t;
     }
 
     private static Date getExpirationDate(String token, String secret) {
-        Date expiration;
         try {
-            expiration = Jwts.parser()
-                    .setSigningKey(secret)
-                    .parseClaimsJws(token)
-                    .getBody()
+            SecretKey key = Keys.hmacShaKeyFor(secret.getBytes());
+
+            return Jwts.parser()
+                    .verifyWith(key)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload()
                     .getExpiration();
+
         } catch (Exception e) {
-            expiration = null;
+            return null;
         }
-        return expiration;
     }
 
     public static String generateToken(UserDetails userDetails, UserType userType, String secret, long expiration) {

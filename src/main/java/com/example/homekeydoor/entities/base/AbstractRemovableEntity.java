@@ -1,5 +1,6 @@
-package com.example.homekeydoor.entities;
+package com.example.homekeydoor.entities.base;
 
+import com.example.homekeydoor.entities.base.AbstractEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 

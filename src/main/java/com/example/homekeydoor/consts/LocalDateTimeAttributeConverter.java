@@ -1,4 +1,4 @@
-package com.example.homekeydoor.security;
+package com.example.homekeydoor.consts;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;

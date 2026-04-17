@@ -8,9 +8,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 
-/**
- * Created by garik
- */
 public class SecureUser implements UserDetails {
 
     private User userEntity;

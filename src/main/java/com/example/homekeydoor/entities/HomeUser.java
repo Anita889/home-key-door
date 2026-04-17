@@ -9,5 +9,5 @@ import lombok.Setter;
 @Getter
 @Setter
 @Table(name = "home_owners")
-public class HomeUser {
+public class HomeUser extends BaseUserEntity {
 }

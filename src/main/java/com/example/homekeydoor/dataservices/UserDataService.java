@@ -1,10 +1,11 @@
 package com.example.homekeydoor.dataservices;
 
 
-import com.example.homekeydoor.entities.Role;
+import com.example.homekeydoor.entities.base.Role;
 import com.example.homekeydoor.entities.User;
+import com.example.homekeydoor.entities.QUser;
 import com.example.homekeydoor.repositories.UserRepository;
-import com.example.homekeydoor.security.RegistrationType;
+import com.example.homekeydoor.consts.RegistrationType;
 import com.google.common.collect.Lists;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Predicate;
@@ -58,24 +59,24 @@ public class UserDataService extends AbstractRemovableDataService<User, Long> {
 
     public List<User> findByRoleExludeExistingUsers(Role role, Collection<User> userEntityCollection){
         List<Predicate> predicates = new ArrayList<>();
-        predicates.add(QUser.userEntity.roles.contains(role));
-        predicates.add(QUser.userEntity.removed.isFalse());
+        predicates.add(QUser.roles.contains(role));
+        predicates.add(QUser.removed.isFalse());
         if(userEntityCollection != null && !userEntityCollection.isEmpty()){
-            predicates.add(QUser.userEntity.notIn(userEntityCollection));
+            predicates.add(QUser.notIn(userEntityCollection));
         }
         return Lists.newArrayList(userRepository.findAll(ExpressionUtils.allOf(predicates)));
     }
 
 
     private void addFilteredPredicates(Collection<User> userEntityCollection, List<Role> roles, List<Predicate> predicates){
-        predicates.add(QUser.userEntity.removed.isFalse());
+        predicates.add(QUser.removed.isFalse());
         if(userEntityCollection != null && !userEntityCollection.isEmpty()){
-            predicates.add(QUser.userEntity.in(userEntityCollection));
+            predicates.add(QUser.in(userEntityCollection));
         }
 
         if(roles != null){
             for(Role role : roles){
-                predicates.add(QUser.userEntity.roles.contains(role));
+                predicates.add(QUser.roles.contains(role));
             }
         }
 

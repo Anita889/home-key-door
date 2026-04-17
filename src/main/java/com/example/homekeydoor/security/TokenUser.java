@@ -1,5 +1,6 @@
 package com.example.homekeydoor.security;
 
+import com.example.homekeydoor.consts.UserType;
 import java.time.LocalDateTime;
 
 public class TokenUser {

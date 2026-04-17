@@ -1,6 +1,6 @@
 package com.example.homekeydoor.dataservices;
 
-import com.example.homekeydoor.entities.AbstractRemovableEntity;
+import com.example.homekeydoor.entities.base.AbstractRemovableEntity;
 import com.example.homekeydoor.repositories.BaseRemovableRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
