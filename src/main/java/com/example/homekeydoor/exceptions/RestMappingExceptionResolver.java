@@ -2,21 +2,14 @@ package com.example.homekeydoor.exceptions;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.AbstractHandlerExceptionResolver;
 import java.time.LocalDateTime;
-import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
 public class RestMappingExceptionResolver extends AbstractHandlerExceptionResolver {
-
-    @Autowired
-    private MappingJackson2HttpMessageConverter jacksonConverter;
-
     @Override
     protected ModelAndView doResolveException(HttpServletRequest request, HttpServletResponse response,
                                               Object handler, Exception ex) {
@@ -35,11 +28,11 @@ public class RestMappingExceptionResolver extends AbstractHandlerExceptionResolv
     }
 
     private ModelAndView getModelAndView(HttpServletRequest request, Exception ex, HttpStatus status) {
-        MappingJackson2JsonView view = new MappingJackson2JsonView(jacksonConverter.getObjectMapper());
-        view.setExtractValueFromSingleKeyModel(true);
-        ModelAndView mv = new ModelAndView(view);
-        mv.addObject(getResponseObject(request, ex, status));
+        RestExceptionResponse response = getResponseObject(request, ex, status);
+        ModelAndView mv = new ModelAndView();
         mv.setStatus(status);
+        mv.addObject(response);
+
         return mv;
     }
 

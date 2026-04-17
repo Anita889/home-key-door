@@ -51,8 +51,8 @@ public class UserRestAuthController extends BaseUserAuthController {
     @Autowired
     private UserMapper userMapper;
 
-    @Value("${userauth.changepassword.expiration}")
-    protected long tempKeyExpiration;
+//    @Value("${userauth.changepassword.expiration}")
+//    protected long tempKeyExpiration;
 
     @RequestMapping(value = "login", method = RequestMethod.POST)
     public ResponseEntity<?> login(@RequestBody AuthDTO authDTO) throws AuthenticationException {
@@ -86,10 +86,10 @@ public class UserRestAuthController extends BaseUserAuthController {
         }
         String key = UUID.randomUUID().toString();
         userEntity.setKey(key);
-        userEntity.setTempKeyExpireDatetime(LocalDateTime.now().plusSeconds(tempKeyExpiration));
+        //userEntity.setTempKeyExpireDatetime(LocalDateTime.now().plusSeconds(tempKeyExpiration));
 
         userEntity = userDataService.save(userEntity);
-        emailService.sendUserPasswordChange(userEntity);
+       // emailService.sendUserPasswordChange(userEntity);
         return ResponseEntity.ok(new ValueDTO<>(true));
     }
 

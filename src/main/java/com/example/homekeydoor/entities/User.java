@@ -19,10 +19,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @Table(name = "users")
 public class User extends BaseUserEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
 
     @Column(name = "login_date")
     private LocalDate loginDate;
