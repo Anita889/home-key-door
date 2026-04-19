@@ -14,7 +14,7 @@ public class RoleDataService {
     private RoleRepository roleRepository;
 
     public Role findByName(String roleAdmin) {
-        return null;
+        return roleRepository.findByName(roleAdmin);
     }
 }
 

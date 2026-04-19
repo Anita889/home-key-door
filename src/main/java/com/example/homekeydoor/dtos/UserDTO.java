@@ -1,7 +1,7 @@
 package com.example.homekeydoor.dtos;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import java.util.List;
+import java.util.Set;
 import org.hibernate.validator.constraints.Length;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -12,7 +12,7 @@ public class UserDTO extends AbstractDTO {
     protected String firstName;
     protected String lastName;
 
-    protected List<RoleDTO> roles;
+    protected Set<RoleDTO> roles;
 
     protected String position;
     protected String avatarUrl;
@@ -60,11 +60,11 @@ public class UserDTO extends AbstractDTO {
         this.password = password;
     }
 
-    public List<RoleDTO> getRoles() {
+    public Set<RoleDTO> getRoles() {
         return roles;
     }
 
-    public void setRoles(List<RoleDTO> roles) {
+    public void setRoles(Set<RoleDTO> roles) {
         this.roles = roles;
     }
 
