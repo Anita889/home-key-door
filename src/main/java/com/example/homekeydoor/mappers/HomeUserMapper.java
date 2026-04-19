@@ -2,8 +2,8 @@ package com.example.homekeydoor.mappers;
 
 
 import com.example.homekeydoor.dtos.HomeUserDTO;
-import com.example.homekeydoor.entities.HomeOwner;
 import com.example.homekeydoor.entities.HomeUser;
+import com.example.homekeydoor.entities.User;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -20,9 +20,11 @@ public class HomeUserMapper {
     public HomeUser toEntity(HomeUserDTO dto) {
         HomeUser obj = new HomeUser();
         obj.setId(dto.getId());
-        obj.getUser().setFirstName(dto.getFirstName());
-        obj.getUser().setLastName(dto.getSecondName());
-        obj.getUser().setEmail(dto.getEmail());
+        User user = new User();
+        user.setFirstName(dto.getFirstName());
+        user.setLastName(dto.getSecondName());
+        user.setEmail(dto.getEmail());
+        obj.setUser(user);
         return obj;
     }
 }

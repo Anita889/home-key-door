@@ -1,6 +1,7 @@
 package com.example.homekeydoor.entities;
 
 import com.example.homekeydoor.entities.base.AbstractRemovableEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
@@ -12,7 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 @Entity
-@Table(name = "home_owners")
+@Table(name = "home_users")
 public class HomeUser extends AbstractRemovableEntity<Long> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,7 +22,7 @@ public class HomeUser extends AbstractRemovableEntity<Long> {
     @OneToMany(mappedBy = "homeUser")
     private List<Key> keys;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 

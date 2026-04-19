@@ -30,7 +30,7 @@ public class Key extends AbstractRemovableEntity<Long> {
     private Home home;
 
     @ManyToOne
-    @JoinColumn(name = "home_user_id", nullable = false)
+    @JoinColumn(name = "home_user_id")
     private HomeUser homeUser;
 
     @Override
